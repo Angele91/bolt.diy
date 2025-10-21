@@ -59,11 +59,8 @@ CMD ["node", "build/server/index.js"]
 
 
 # ---- development stage ----
-FROM build AS development
-
-# The 'build' stage pruned dependencies, which can corrupt node_modules.
-# Reinstall everything from lockfile for a clean dev environment.
-RUN rm -rf node_modules && pnpm install --frozen-lockfile
+# Using runtime as base instead of build to force production mode
+FROM runtime AS development
 
 # Initialize git repository for development (needed by pre-start.cjs)
 RUN git init && git config user.email "dev@bolt.diy" && git config user.name "Dev User"
@@ -99,4 +96,5 @@ ENV GROQ_API_KEY=${GROQ_API_KEY} \
     RUNNING_IN_DOCKER=true
 
 RUN mkdir -p /app/run
-CMD ["pnpm", "run", "dev", "--host"]
+# Use the same production command as the runtime stage
+CMD ["node", "build/server/index.js"]
