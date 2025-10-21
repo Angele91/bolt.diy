@@ -61,8 +61,8 @@ CMD ["node", "build/server/index.js"]
 # ---- development stage ----
 FROM build AS development
 
-# Install remix CLI globally for development
-RUN pnpm add -g @remix-run/cli
+# Install remix CLI for development (local install)
+RUN pnpm add @remix-run/cli
 
 # Initialize git repository for development (needed by pre-start.cjs)
 RUN git init && git config user.email "dev@bolt.diy" && git config user.name "Dev User"
@@ -81,6 +81,7 @@ ARG OLLAMA_API_BASE_URL
 ARG XAI_API_KEY
 ARG TOGETHER_API_KEY
 ARG TOGETHER_API_BASE_URL
+ARG AWS_BEDROCK_CONFIG
 ARG VITE_LOG_LEVEL=debug
 ARG DEFAULT_NUM_CTX
 
