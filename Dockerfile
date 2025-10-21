@@ -98,4 +98,4 @@ ENV GROQ_API_KEY=${GROQ_API_KEY} \
 RUN mkdir -p /app/run
 # Make sure pnpm is in PATH
 ENV PATH="${PATH}:/app/node_modules/.bin"
-CMD ["pnpm", "run", "dev", "--host"]
+CMD ["node", "/app/node_modules/.bin/pnpm", "run", "dev", "--host"]
