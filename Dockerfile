@@ -96,5 +96,4 @@ ENV GROQ_API_KEY=${GROQ_API_KEY} \
     RUNNING_IN_DOCKER=true
 
 RUN mkdir -p /app/run
-# Use the same production command as the runtime stage
-CMD ["node", "build/server/index.js"]
+CMD ["pnpm", "run", "dev", "--host"]
