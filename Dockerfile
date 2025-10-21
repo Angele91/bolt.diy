@@ -61,6 +61,15 @@ CMD ["node", "build/server/index.js"]
 # ---- development stage ----
 FROM build AS development
 
+# Install remix CLI globally for development
+RUN pnpm add -g @remix-run/cli
+
+# Initialize git repository for development (needed by pre-start.cjs)
+RUN git init && git config user.email "dev@bolt.diy" && git config user.name "Dev User"
+
+# Reinstall dev dependencies for development
+RUN pnpm install --dev
+
 # Define environment variables for development
 ARG GROQ_API_KEY
 ARG HuggingFace_API_KEY
