@@ -39,8 +39,8 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# Install curl and git so Coolify's healthcheck works inside the image
-RUN apt-get update && apt-get install -y --no-install-recommends curl git \
+# Install curl, wget and git so Coolify's healthcheck works inside the image
+RUN apt-get update && apt-get install -y --no-install-recommends curl wget git \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy only what we need to run
