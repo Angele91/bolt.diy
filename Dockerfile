@@ -6,8 +6,10 @@ WORKDIR /app
 ENV HUSKY=0
 ENV CI=true
 
-# Use pnpm
-RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
+# Install git and use pnpm
+RUN apt-get update && apt-get install -y --no-install-recommends git \
+  && rm -rf /var/lib/apt/lists/* \
+  && corepack enable && corepack prepare pnpm@9.15.9 --activate
 
 # Accept (optional) build-time public URL for Remix/Vite (Coolify can pass it)
 ARG VITE_PUBLIC_APP_URL
@@ -37,8 +39,8 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# Install curl so Coolify’s healthcheck works inside the image
-RUN apt-get update && apt-get install -y --no-install-recommends curl \
+# Install curl and git so Coolify's healthcheck works inside the image
+RUN apt-get update && apt-get install -y --no-install-recommends curl git \
   && rm -rf /var/lib/apt/lists/*
 
 # Copy only what we need to run
