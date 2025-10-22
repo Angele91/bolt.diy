@@ -25,7 +25,7 @@ COPY . .
 RUN pnpm install --offline --frozen-lockfile
 
 # Build the Remix app (SSR + client)
-RUN NODE_OPTIONS=--max-old-space-size=2048 pnpm run build
+RUN NODE_OPTIONS=--max-old-space-size=3072 pnpm run build
 
 # We need to keep development dependencies for development mode
 # For production, we would prune them but this causes issues with remix
