@@ -39,9 +39,10 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# Install curl, wget and git so Coolify's healthcheck works inside the image
+# Install curl, wget, git and enable pnpm
 RUN apt-get update && apt-get install -y --no-install-recommends curl wget git \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && corepack enable && corepack prepare pnpm@9.15.9 --activate
 
 # Copy only what we need to run
 COPY --from=build /app/build /app/build
