@@ -1,13 +1,14 @@
 services:
   app-prod:
     image: bolt-ai:production
+    pull_policy: build  # <--- THIS IS THE FIX
     build:
       context: .
       dockerfile: Dockerfile
       target: bolt-ai-production
     ports:
       - '5173:5173'
-    env_file: 
+    env_file:
       - '.env'
       - '.env.local'
     environment:
@@ -39,7 +40,7 @@ services:
     image: bolt-ai:development
     build:
       target: bolt-ai-development
-    env_file: 
+    env_file:
       - '.env'
       - '.env.local'
     environment:
