@@ -27,8 +27,9 @@ RUN pnpm install --offline --frozen-lockfile
 # Build the Remix app (SSR + client)
 RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
 
-# Keep only production deps for runtime
-RUN pnpm prune --prod --ignore-scripts
+# We need to keep development dependencies for development mode
+# For production, we would prune them but this causes issues with remix
+# RUN pnpm prune --prod --ignore-scripts
 
 
 # ---- runtime stage ----
@@ -41,7 +42,7 @@ ENV HOST=0.0.0.0
 
 # Node is already in /usr/local/bin in the base image
 
-# Install curl, wget, git and enable pnpm
+# Install curl, wget, git and enable pnpm globally
 RUN apt-get update && apt-get install -y --no-install-recommends curl wget git \
   && rm -rf /var/lib/apt/lists/* \
   && corepack enable && corepack prepare pnpm@9.15.9 --activate
@@ -50,6 +51,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl wget git \
 COPY --from=build /app/build /app/build
 COPY --from=build /app/node_modules /app/node_modules
 COPY --from=build /app/package.json /app/package.json
+COPY --from=build /app/pre-start.cjs /app/pre-start.cjs
+COPY --from=build /app/vite.config.ts /app/vite.config.ts
+COPY --from=build /app/vite-electron.config.ts /app/vite-electron.config.ts
+COPY --from=build /app/uno.config.ts /app/uno.config.ts
+COPY --from=build /app/tsconfig.json /app/tsconfig.json
+COPY --from=build /app/bindings.sh /app/bindings.sh
 
 EXPOSE 3000
 
@@ -65,8 +72,17 @@ CMD ["node", "build/server/index.js"]
 # Using runtime as base instead of build to force production mode
 FROM runtime AS development
 
+# Copy app source files for development
+COPY --from=build /app/app /app/app
+COPY --from=build /app/public /app/public
+
 # Initialize git repository for development (needed by pre-start.cjs)
-RUN git init && git config user.email "dev@bolt.diy" && git config user.name "Dev User"
+RUN git init && \
+    git config user.email "dev@bolt.diy" && \
+    git config user.name "Dev User" && \
+    touch .gitignore && \
+    git add .gitignore && \
+    git commit -m "Initial commit"
 
 # Define environment variables for development
 ARG GROQ_API_KEY
@@ -99,6 +115,8 @@ ENV GROQ_API_KEY=${GROQ_API_KEY} \
     RUNNING_IN_DOCKER=true
 
 RUN mkdir -p /app/run
-# Make sure pnpm is in PATH - both local and global
+# Make sure all binaries are available anywhere in the container
 ENV PATH="/usr/local/bin:${PATH}:/app/node_modules/.bin"
-CMD ["pnpm", "run", "dev", "--host"]
+# Make bindings.sh executable
+RUN chmod +x /app/bindings.sh
+CMD ["/bin/sh", "-c", "cd /app && pnpm run dockerstart"]
