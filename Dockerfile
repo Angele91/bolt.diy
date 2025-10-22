@@ -119,4 +119,4 @@ RUN mkdir -p /app/run
 ENV PATH="/usr/local/bin:${PATH}:/app/node_modules/.bin"
 # Make bindings.sh executable
 RUN chmod +x /app/bindings.sh
-CMD ["/bin/sh", "-c", "cd /app && pnpm run dockerstart"]
+CMD ["pnpm", "run", "dockerstart"]
