@@ -39,8 +39,7 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-# Create a symbolic link for node to ensure it's in PATH everywhere
-RUN ln -sf $(which node) /usr/local/bin/node
+# Node is already in /usr/local/bin in the base image
 
 # Install curl, wget, git and enable pnpm
 RUN apt-get update && apt-get install -y --no-install-recommends curl wget git \
