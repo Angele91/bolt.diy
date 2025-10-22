@@ -39,6 +39,9 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
+# Create a symbolic link for node to ensure it's in PATH everywhere
+RUN ln -sf $(which node) /usr/local/bin/node
+
 # Install curl, wget, git and enable pnpm
 RUN apt-get update && apt-get install -y --no-install-recommends curl wget git \
   && rm -rf /var/lib/apt/lists/* \
@@ -97,6 +100,6 @@ ENV GROQ_API_KEY=${GROQ_API_KEY} \
     RUNNING_IN_DOCKER=true
 
 RUN mkdir -p /app/run
-# Make sure pnpm is in PATH
-ENV PATH="${PATH}:/app/node_modules/.bin"
-CMD ["node", "/app/node_modules/.bin/pnpm", "run", "dev", "--host"]
+# Make sure pnpm is in PATH - both local and global
+ENV PATH="/usr/local/bin:${PATH}:/app/node_modules/.bin"
+CMD ["pnpm", "run", "dev", "--host"]
